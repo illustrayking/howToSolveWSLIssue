@@ -90,5 +90,35 @@ Windows Subsystem for Linux
 
 پس ری استارت کرده و بگذارید ماشین شما تمام تغییرات رو ثبت کنه
 
+## قدم چهارم نصب پیش نیازها
+
+برای اینکه بتونیم محیط ترمینال Ubuntu رو داشته باشیم و اینکه در قسمت های بعدی که میخواهیم چیزهایی رو اضافه کنیم در همین بخش به دانلود تمامی پیش نیازها میپردازیم
+
+> توجه داشته باشید که هر چیزی رو که دانلود میکنید رو نصب نکنید تا زمانی که وقتش برسه و خودم در مطلب اشاره میکنم
+
+بعضی از سیستم ها نیازمند این هست که کرنل wsl رو به صورت دستی آپدیت کنیم تا پذیرای WSL2 بشه
+
+پس این فایل رو دانلود کنید 
+
+[WSL2 Kernel](https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi)
+
+برای فصل بعدی که بسیار مهم هست نیازمند نصب `powershell 7.0` هستیم
+
+[Powershell 7.0](https://github-production-release-asset-2e65be.s3.amazonaws.com/49609581/5a5c1280-abe7-11ea-88a2-4815f124fd42?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20200624%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20200624T074332Z&X-Amz-Expires=300&X-Amz-Signature=6cb246b937af1d2fe6c69ed241fad6aee49783a0bbf3b83e124d44c26338f5ce&X-Amz-SignedHeaders=host&actor_id=25862601&repo_id=49609581&response-content-disposition=attachment%3B%20filename%3DPowerShell-7.0.2-win-x64.msi&response-content-type=application%2Foctet-stream)
+
+و حالا وارد استور میشیم و به نصب دو چیز میپردازیم 
+
+<div dir="ltr">
+
+1- Ubuntu 20.04 LTS
+
+2- Windows Terminal
+</div>
+
+که هر دوی اینها درون استور مهیا هستند و فقط کافی هست که شما اونها رو نصب کنید
+
+![ubuntu 20.04 LTS in windows store](./images/ubuntu.png)
+
+![windows terminal in windows store](./images/windowsTerminal.png)
 
 </div>
