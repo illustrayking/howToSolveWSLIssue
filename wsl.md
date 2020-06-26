@@ -106,7 +106,9 @@ Windows Subsystem for Linux
 
 برای فصل بعدی که بسیار مهم هست نیازمند نصب `powershell 7.0` هستیم
 
-#### [Powershell_7.0](https://github-production-release-asset-2e65be.s3.amazonaws.com/49609581/5a5c1280-abe7-11ea-88a2-4815f124fd42?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20200624%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20200624T074332Z&X-Amz-Expires=300&X-Amz-Signature=6cb246b937af1d2fe6c69ed241fad6aee49783a0bbf3b83e124d44c26338f5ce&X-Amz-SignedHeaders=host&actor_id=25862601&repo_id=49609581&response-content-disposition=attachment%3B%20filename%3DPowerShell-7.0.2-win-x64.msi&response-content-type=application%2Foctet-stream)
+#### [Powershell_7.0](https://github.com/PowerShell/powershell/releases)
+
+> برای اینکه Powershell رو دانلود کنیم کافی هست که بریم به بخش Assests و بر روی اون فایلی که آخرین ورژن هست و با فرمت .msi هست کلیک کنیم به طور مثال PowerShell-7.0.2-win-x64.msi
 
 و حالا وارد استور میشیم و به نصب دو چیز میپردازیم 
 
