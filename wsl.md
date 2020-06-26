@@ -106,7 +106,7 @@ Windows Subsystem for Linux
 
 برای فصل بعدی که بسیار مهم هست نیازمند نصب `powershell 7.0` هستیم
 
-[Powershell 7.0](https://github-production-release-asset-2e65be.s3.amazonaws.com/49609581/5a5c1280-abe7-11ea-88a2-4815f124fd42?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20200624%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20200624T074332Z&X-Amz-Expires=300&X-Amz-Signature=6cb246b937af1d2fe6c69ed241fad6aee49783a0bbf3b83e124d44c26338f5ce&X-Amz-SignedHeaders=host&actor_id=25862601&repo_id=49609581&response-content-disposition=attachment%3B%20filename%3DPowerShell-7.0.2-win-x64.msi&response-content-type=application%2Foctet-stream)
+#### [Powershell_7.0](https://github-production-release-asset-2e65be.s3.amazonaws.com/49609581/5a5c1280-abe7-11ea-88a2-4815f124fd42?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20200624%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20200624T074332Z&X-Amz-Expires=300&X-Amz-Signature=6cb246b937af1d2fe6c69ed241fad6aee49783a0bbf3b83e124d44c26338f5ce&X-Amz-SignedHeaders=host&actor_id=25862601&repo_id=49609581&response-content-disposition=attachment%3B%20filename%3DPowerShell-7.0.2-win-x64.msi&response-content-type=application%2Foctet-stream)
 
 و حالا وارد استور میشیم و به نصب دو چیز میپردازیم 
 
@@ -296,4 +296,17 @@ nameserver 172.20.160.1
 </div>
 
 خودش داره میگه که من `automatically generated` هستم درسته که خودش داره بهت میگه که اینکارو بکن که جلوی این حالت رو بگیری اما ماشین توجهی نداره و کار خودش رو میکنه
+
+
+### **خب ما میخواهیم چه مشکلاتی رو حل کنیم؟**
+
+1- میخواهیم کاری کنیم که WSL دارای آی پی با رنج کلاس `C` یا همون حالت `192.168.1.xxx` باشه
+
+2- دلم میخواد ماشین مجازی من یعنی `WSL` از کانکشن `Ethernet` من هم استفاده کنه برای ارتباط گرفتن
+
+3- دلم میخواد هیچ وقت فایل `resolv.conf` تغییر نکنه و اون چیزی بشه که من مینویسم براش
+
+4- به کانکش ویندوز و اوبونتو دو آی پی جداگانه و `static` بدم و همیشه با اون رنج آی پی ها کار خودش رو شروع کنه
+
+5- دلم میخواد تمامی این نکاتی رو که در بالا گفتم رو خود ویندوز انجام بده و نه من ( چون همونطوری که گفتم به محض ری استارت و یا خاموش کردن همه چیز ریست میشه و حتی بهتره بگیم بهم میریزه)
 </div>
