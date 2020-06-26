@@ -499,5 +499,174 @@ Set-VMSwitch WSL -NetAdapterName 'Wi-Fi'
 
 توسط این دستور یعنی `Set-VMSwitch` میخواهیم به `WSL` خودمون آداپتور `Ethernet` رو بدیم یا هر آداپتوری که خودتون میخواهید پس همونطور که نام آداپتور رو پیدا کردیم در بخش `adapter_name` مینویسیم
 
+### **قدم پنجم سِت کردن آی پی و دی ان اس Static برای ویندوز**
+
+خب به مرحله یکم سخت کار رسیدیم و باید آستین ها رو بالا بزنیم دستهامون رو تا آرنج توی کد بکنیم
+
+همونطور که قبلا گفتم به محض اینکه شما از ویندوز آداپتور رو میگیرید، ویندوز آداپتور اوبونتو رو برای خودش میکنه که با دادن یک استاتیک آی پی مشکل ما حل میشه
+
+اما من یک مسئله عجیبی رو کشف کردم
+
+هنگامی که من دستگاه رو `restart` میکردم، اوبونتو دو کانکشن به نام های `vEthernet WSL` و `vEthernet WSL 2` ایجاد میکرد و ویندوز اونی رو که دارای `Index` بالاتر باشه رو انتخاب میکنه که در اینجا `vEthernet WSL 2` از همه بالاتر هست
+
+اما هنگامی که من مستقیم سیستم رو `shutdown` میکردم و بعد از مدتی اون رو روشن میکردم خبری از `vEthernet WSL2` نبود
+
+پس اینجا برای من یک چالش ایجاد کرد که باید کدی رو مینوشتم که چک کنه هر وقت `vEthernet WSL 2` بود آی پی استاتیک رو به اون بده و هر وقت `vEthernet WSL` بود آی پی ماله اون بشه
+
+اینجا بود که دید برنامه نویسیم به کارم اومد
+
+ما توی برنامه نویسی دو اندیس داریم به نام های `Logical Operations` یعنی اوپراتورهای منطقی یعنی `&&` و `||` یا همون `and or` توسط اینها یک شرط ایجاد میکنم
+
+کانسپت به این شکل هست
+
+<div dir="ltr">
+
+```
+if vEthernet (WSL) 2 exists then assign IP to vEthernet (WSL) 2 else IP is owned by vEthernet (WSL)
+```
+</div>
+
+در متن بالا گفتم که اگر دومین آداپتور وجود داشت آی پی ماله اون هست اما اگر نبود آی پی در اختیار `vEthernet WSL` هست
+
+پس من میتونم اینکار رو تنها با `||` انجام بدم اگر دومین آداپتور وجود داشته باشه دستور بعد `||` اجرا نمیشه و اگر وجود نداشت میره دستور دوم رو اجرا میکنه
+
+مشکل بعدی که وجود داره این هست که هر دو کانکشن دارای آی پی و بقیه اطلاعات هستند پس باید ابتدا از اونها این مقادیر رو گرفت و به اصطلاح `NIC` رو ببریم توی حالت `DHCP`
+
+پس برای این کار ابتدا درون همون دایرکتوری یک فایل به نام مثلا `ipAdd.ps1` ایجاد میکنیم و سپس دستور زیر رو درون این فایل قرار میدیم
+
+<div dir="ltr">
+
+```
+$ethernetName = 'vEthernet (WSL) 2', 'vEthernet (WSL)'
+
+$ip = '192.168.1.104'
+
+$subnet = 24
+
+$gateway = '192.168.1.1'
+
+$dns = '8.8.8.8','8.8.4.4'
+
+
+
+((Set-NetIPInterface -InterfaceAlias ${ethernetName}[0] -DHCP Enabled -Confirm:$false && Remove-NetRoute -InterfaceAlias ${ethernetName}[0] -Confirm:$false && 
+
+Set-DnsClientServerAddress -InterfaceAlias ${ethernetName}[0] -ResetServerAddresses) && (Set-NetIPInterface -InterfaceAlias ${ethernetName}[1] -DHCP Enabled -Confirm:$false &
+
+& Remove-NetRoute -InterfaceAlias ${ethernetName}[1] -Confirm:$false && Set-DnsClientServerAddress -InterfaceAlias ${ethernetName}[1] -ResetServerAddresses))
+
+
+
+((netsh interface set interface ${$ethernetName}[0] disable && netsh interface set interface ${$ethernetName}[0] enable) && (netsh interface set interface ${$ethernetName}[1] 
+
+disable && netsh interface set interface ${$ethernetName}[1] enable))
+
+
+
+((New-NetIPAddress -IPAddress $ip -DefaultGateway $gateway -PrefixLength $subnet -InterfaceAlias ${ethernetName}[0] && Set-DNSClientServerAddress -interfaceAlias $
+
+{ethernetName}[0] -ServerAddresses (${dns}[0], ${dns}[1])) || (New-NetIPAddress -IPAddress $ip -DefaultGateway $gateway -PrefixLength $subnet -InterfaceAlias ${ethernetName}
+
+[1] && Set-DNSClientServerAddress -interfaceAlias ${ethernetName}[1] -ServerAddresses (${dns}[0], ${dns}[1])))
+
+```
+</div>
+
+یا روح [دنیس ریچی](https://en.wikipedia.org/wiki/Dennis_Ritchie) این دیگه چی هست!!!
+
+![scary face](./images/fear.gif)
+
+خب قبل از هر چیزی مطمئنا با دیدن این کد حالتون خراب شد مثل من اما به هیچ عنوان نترسید چون همش تکرار هست و فقط دو یا سه دستور داره که باید بدونیم چی هستند و بقیش همش تکراره
+
+این فایل دارای چهار بخش هست
+
+1- ابتدا مقادیرهایی که هی تکرار میشن رو من تبدیل به متغیر کردم یا همون `variable`
+
+2- بخش دوم کارش این هست که کانکشن های من رو یعنی هم `vEthernet WSL` و `vEthernet WSL 2` رو *ریست* کنه
+
+3- بخش سوم کارش این هست که یکبار کانکشن ها رو برای من ری استارت کنه
+
+4- و در نهایت در بخش چهارم کارش این هست که یکی از کانکشن ها مجهز به آی پی و دی ان اس بشن
+
+بریم ذره دره دستورات رو بشکافیم با هم که کمی از ترسش ریخته بشه و بدونیم دقیقا داریم چیکار میکنیم
+
+**دستور اول**
+
+<div dir="ltr">
+
+```
+Set-NetIPInterface -InterfaceAlias ${ethernetName}[0] -DHCP Enabled -Confirm:$false
+```
+</div>
+
+این دستور برای من میاد کانکشن مورد نظر من رو از هر گونه `ip` و `subnetmask` پاک میکنه یا بهتره بگیم که اون رو توی حالت `DHCP Enabled` میبره و برای اینکه از ما سوالی نپرسه از دستور `-Confirm:$false` استفاده میکنیم
+
+و توسط `InterfaceAlias` بهش میگیم کدوم کانکشن رو مدنظرم هست، در اینجا چون من از متغیر دارم استفاده میکنم و متغیر من که همون `ethernetName` هست در حالت `array` هست باید از `interpolation` استفاده کنم (کسانی که `sass` یا `Javascript` کار هستند میدونن این یعنی چی)
+
+**دستور دوم**
+
+<div dir="ltr">
+
+```
+Remove-NetRoute -InterfaceAlias ${ethernetName}[0] -Confirm:$false
+```
+</div>
+
+در بخش دوم به علت اینکه وقتی کانکشن ریست میشه ولی gateway رو پاک نمیکنه مجبور به استفاده دستور `Remove-NetRoute` هستیم
+
+اگر دقت کنید من از `&&` استفاده کردم برای اینکه بگم هر دو باید انجام بشن به شرط اینکه دستور سمت چپ به درستی اجرا شده باشه
+
+**دستور سوم**
+
+<div dir="ltr">
+
+```
+Set-DnsClientServerAddress -InterfaceAlias ${ethernetName}[0] -ResetServerAddresses
+```
+</div>
+
+در بخش سوم میخوام که `DNS` کانکشن مورد نظر رو هم پاک کنه پس توسط این دستور اینکار رو انجام میدم
+
+و سپس همین کار رو دوباره برای یک کانکشن دیگه یعنی `vEthernet WSL` انجام میدم
+
+**دستور چهارم**
+
+<div dir="ltr">
+
+```
+netsh interface set interface ${$ethernetName}[0] disable && netsh interface set interface ${$ethernetName}[0] enable
+```
+</div>
+
+در دستور بعد کانکشن مورد نظرم رو یکبار `disable` و بعد `enabled` کردم چیزی شبیه به همون ری استارت که مطمئن بشم همه چیز پاک شده و به درستی کار میکنه
+
+**دستور پنجم**
+
+<div dir="ltr">
+
+```
+New-NetIPAddress -IPAddress $ip -DefaultGateway $gateway -PrefixLength $subnet -InterfaceAlias ${ethernetName}[0]
+```
+</div>
+
+توسط این دستور یعنی `New-NetIPAddress` به کانکشن مورد نظر خودم `ip,gateway,subnetmask` رو یکجا دادم یعنی چیزی شبیه به تصویر پایین رو درون کانکشن دادم
+
+![how command above implement ip configuration to my connection](./images/ip.png)
+
+**دستور ششم**
+
+<div dir="ltr">
+
+```
+Set-DNSClientServerAddress -interfaceAlias ${ethernetName}[0] -ServerAddresses (${dns}[0], ${dns}[1])
+```
+</div>
+
+و سپس در دستور بعدی به Interface مورد نظر خودم که در اینجا `vEthernet WSL 2` هست دی ان اس میدم یعنی همون مقدار متغیر `$dns`
+
+دقیقا معجزه بعد از این دستور اتفاق می افته یعنی وجود `||` یا همون `or` که بهش میگم اگر در دستور اول `vEthernet WSL 2` بود که دیگه دستور بعد `||` رو اجرا نکن یعنی دیگه نیا آی پی بده به `vEthernet WSL` ولی اگر `vEthernet WSL 2` وجود نداشت ( یعنی همون حالت shutdown`) برو توی کار دومین دستور
+
+شما تنها کاری که باید در اینجا انجام بدید این هست که مقدار متغیر های نظیر `ip` و `gateway` رو به اون چیزی که میخواهید تغییر بدید مثلا ممکن هست روتر مورد نظر شما از `192.168.0.1`  استفاده کنه پس به طور مثال به این ترتیب آی پی شما میشه `192.168.0.104`
+
 
 </div>
